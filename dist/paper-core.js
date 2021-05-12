@@ -1,5 +1,5 @@
 /*!
- * Paper.js v0.12.15 - The Swiss Army Knife of Vector Graphics Scripting.
+ * Paper.js v0.12.15-develop - The Swiss Army Knife of Vector Graphics Scripting.
  * http://paperjs.org/
  *
  * Copyright (c) 2011 - 2020, Jürg Lehni & Jonathan Puckey
@@ -9,7 +9,7 @@
  *
  * All rights reserved.
  *
- * Date: Wed Mar 17 10:49:48 2021 +0100
+ * Date: Wed May 12 12:00:22 2021 -0300
  *
  ***
  *
@@ -821,7 +821,7 @@ var PaperScope = Base.extend({
 		}
 	},
 
-	version: "0.12.15",
+	version: "0.12.15-develop",
 
 	getView: function() {
 		var project = this.project;
@@ -3900,9 +3900,7 @@ new function() {
 			resolution = arg0;
 			insert = arg1;
 		}
-		if (raster) {
-			raster.matrix.reset(true);
-		} else {
+		if (!raster) {
 			raster = new Raster(Item.NO_INSERT);
 		}
 		var bounds = this.getStrokeBounds(),
@@ -3921,7 +3919,7 @@ new function() {
 			this.draw(ctx, new Base({ matrices: [matrix] }));
 			ctx.restore();
 		}
-		raster.transform(
+		raster._matrix.set(
 			new Matrix()
 				.translate(topLeft.add(boundsSize.divide(2)))
 				.scale(1 / scale)
@@ -5730,9 +5728,14 @@ var Raster = Item.extend({
 				rect.width, rect.height);
 	},
 
-	setImageData: function(data ) {
+	putImageData: function(data ) {
 		var point = Point.read(arguments, 1);
 		this.getContext(true).putImageData(data, point.x, point.y);
+	},
+
+	setImageData: function(data) {
+		this.setSize(data);
+		this.getContext(true).putImageData(data, 0, 0);
 	},
 
 	_getBounds: function(matrix, options) {
